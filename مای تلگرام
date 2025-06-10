@@ -1,0 +1,75 @@
+import logging
+import requests
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+
+# تنظیمات لاگینگ
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+)
+logger = logging.getLogger(__name__)
+
+# توکن ربات و آیدی چت
+BOT_TOKEN = "7961229507:AAGpwjpA66x79XV0I8F63LGAiLkhzB2Crms"
+CHAT_ID = 1252653985
+
+SOLANA_API_URL = "https://api.solscan.io"
+
+def get_high_value_meme_coins():
+    """دریافت کیف‌پول‌ها و توکن‌هایی که بالای ۱۰ هزار دلار خرید داشتن."""
+    try:
+        # اینجا باید API واقعی رو جایگزین کنی
+        response = requests.get(f"{SOLANA_API_URL}/example-endpoint")
+        response.raise_for_status()
+        data = response.json()
+
+        # داده‌های نمونه (باید جایگزین واقعی بشه)
+        filtered_data = [
+            {
+                "wallet": "ExampleWallet123",
+                "token": "ExampleMemeCoin",
+                "contract": "ExampleContractAddress",
+                "value_usd": 15000,
+            }
+        ]
+        return filtered_data
+
+    except requests.RequestException as e:
+        logger.error(f"خطا در دریافت اطلاعات از API: {e}")
+        return []
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """دستور /start ربات"""
+    await update.message.reply_text("سلام! ربات شما آماده است 🚀")
+
+async def analyze_wallets(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """تحلیل کیف‌پول‌ها و ارسال نتایج"""
+    await update.message.reply_text("در حال تحلیل کیف‌پول‌ها... لطفا صبر کنید.")
+
+    results = get_high_value_meme_coins()
+
+    if results:
+        message = "\n".join(
+            [
+                f"کیف‌پول: {item['wallet']}\nتوکن: {item['token']}\nآدرس قرارداد: {item['contract']}\nارزش (دلار): ${item['value_usd']:,}\n"
+                for item in results
+            ]
+        )
+        await update.message.reply_text(f"نتایج تحلیل:\n{message}")
+    else:
+        await update.message.reply_text("نتیجه‌ای یافت نشد.")
+
+def main():
+    """اجرای ربات"""
+    application = ApplicationBuilder().token(BOT_TOKEN).build()
+
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("analyze", analyze_wallets))
+
+    application.run_polling()
+
+if __name__ == "__main__":
+    main()
+pip install python-telegram-bot==20.3 requests
+python bot.py
