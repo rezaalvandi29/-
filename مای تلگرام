@@ -73,3 +73,5 @@ if __name__ == "__main__":
     main()
 pip install python-telegram-bot==20.3 requests
 python bot.py
+python-telegram-bot==20.3
+requests
